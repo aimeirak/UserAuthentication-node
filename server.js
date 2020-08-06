@@ -4,6 +4,7 @@ const {pool} = require("./dbconfig");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 const flash = require("express-flash");
+const { render } = require("ejs");
 
 app.use(express.urlencoded({extended:false}));
 
@@ -88,6 +89,23 @@ app.post("/users/register", async (req,res)=>{
             }
         );
 
+    }
+});
+
+app.post("/users/login",(req,res)=>{
+    let {email,password}=req.body;
+    console.log(email,password);
+    let errors=[];
+    if(!email || !password){
+        errors.push({message:"Please enter all fields"});
+    }
+    if(password.length<6){
+        errors.push({message:"password should be atleast 6 charcters"});
+    }
+    if(errors.length>0){
+        // res.render("/users/login",errors);
+        console.log(errors);
+       res.render("login",{errors});
     }
 });
 
