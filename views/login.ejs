@@ -12,11 +12,9 @@
             <li><%=messages.success_msg%></li>
             <% } %>
             
-            <% if(typeof errors!='undefined') { %>
-                <% errors.forEach(error=>{ %>
-                    <li><%= error.message%></li>
-                <% })%>  
-            <% } %>
+            <% if(messages.error){%>
+                <li><%=messages.error%></li>
+                <% } %>
         </ul>
 
         <form action="/users/login" method="POST">
