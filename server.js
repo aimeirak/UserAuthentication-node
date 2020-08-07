@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const session = require("express-session");
 const flash = require("express-flash");
 const { render } = require("ejs");
+const passport = require("passport");
+
 
 app.use(express.urlencoded({extended:false}));
 
@@ -17,8 +19,16 @@ app.use(session({
 
 app.use(flash());
 
+const initializePassport = require("./passportConfig");
+const initialize = require("./passportConfig");
+initializePassport(passport);
+
 const PORT = process.env.PORT || 4000;
 
+
+
+app.use(passport.initialize());
+app.use(passport.session());
 app.set("view engine", "ejs");
 
 app.get("/",(req,res)=>{
@@ -31,7 +41,7 @@ app.get("/users/login",(req,res)=>{
     res.render("login");
 });
 app.get("/users/dashboard",(req,res)=>{
-    res.render("dashboard",{user:"Aime irak"});
+    res.render("dashboard",{user:req.user.name});
 });
 
 
@@ -92,23 +102,12 @@ app.post("/users/register", async (req,res)=>{
     }
 });
 
-app.post("/users/login",(req,res)=>{
-    let {email,password}=req.body;
-    console.log(email,password);
-    let errors=[];
-    if(!email || !password){
-        errors.push({message:"Please enter all fields"});
-    }
-    if(password.length<6){
-        errors.push({message:"password should be atleast 6 charcters"});
-    }
-    if(errors.length>0){
-        // res.render("/users/login",errors);
-        console.log(errors);
-       res.render("login",{errors});
-    }
-});
-
+app.post("/users/login",passport.authenticate("local",{
+    successRedirect:"/users/dashboard",
+    failureRedirect:"/users/login",
+    failureFlash:true
+})
+);
 app.listen(PORT,()=>{
     console.log(`SERVER Running Port ${PORT}`);
 });
